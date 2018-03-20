@@ -47,7 +47,7 @@
 #define SERVER_MINOR_VERSION 4
 
 /* Who implemented this GLX? */
-#define VENDOR "Brian Paul"
+#define VENDOR "Google Inc."
 
 #define EXTENSIONS \
    "GLX_MESA_copy_sub_buffer " \

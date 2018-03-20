@@ -100,11 +100,11 @@ get_string( struct gl_context *ctx, GLenum name )
    switch (name) {
       case GL_RENDERER:
 #if CHAN_BITS == 32
-         return (const GLubyte *) "Mesa OffScreen32";
+         return (const GLubyte *) "Google SwiftShader";
 #elif CHAN_BITS == 16
-         return (const GLubyte *) "Mesa OffScreen16";
+         return (const GLubyte *) "Google SwiftShader";
 #else
-         return (const GLubyte *) "Mesa OffScreen";
+         return (const GLubyte *) "Google SwiftShader";
 #endif
       default:
          return NULL;

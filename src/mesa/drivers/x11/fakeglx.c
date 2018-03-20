@@ -70,7 +70,7 @@
 #define MESA_GLX_VERSION "Mesa " MESA_VERSION_STRING
 
 /* Who implemented this GLX? */
-#define VENDOR "Brian Paul"
+#define VENDOR "Google Inc."
 
 #define EXTENSIONS \
    "GLX_MESA_set_3dfx_mode " \
