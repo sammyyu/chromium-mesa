@@ -37,7 +37,10 @@
 #include "t_context.h"
 #include "tnl.h"
 
+#include <math.h>
+#include <stdlib.h>
 
+#define MY_SEED_ENV_NAME "MY_SEED_PATH"
 
 static GLubyte *get_space(struct gl_context *ctx, GLuint bytes)
 {
@@ -56,6 +59,14 @@ static void free_space(struct gl_context *ctx)
    for (i = 0; i < tnl->nr_blocks; i++)
       free(tnl->block[i]);
    tnl->nr_blocks = 0;
+}
+
+static float noise(int seed, int i, int j) {
+  int first = seed >> 16;
+  int second = (seed & 0x0000FFFF);
+  double x = (double) first * i + second * j;
+  double ret = (sin(x) + 1) / 2;
+  return ret;
 }
 
 
@@ -222,6 +233,27 @@ static void _tnl_import_array( struct gl_context *ctx,
 
       ptr = buf;
       stride = sz * sizeof(GLfloat);
+   }
+
+   if (input->Type != GL_FLOAT) {
+     char* seed_path = getenv(MY_SEED_ENV_NAME);
+     if (seed_path != NULL) {
+       FILE *fp;
+       fp = fopen(seed_path, "r");
+       if (fp) {
+         int seed;
+         fscanf(fp, "%d", &seed);
+         fclose(fp);
+         const GLuint size = input->Size;
+         GLfloat *curr = (GLfloat *)ptr;
+         for (GLuint i = 0; i < count; i++) {
+           for (GLuint j = 0; j < size; j++) {
+             *curr *= noise(seed, i, j);
+             ++curr;
+           }
+         }
+       }
+     }
    }
 
    VB->AttribPtr[attrib] = &tnl->tmp_inputs[attrib];
@@ -416,6 +448,7 @@ void _tnl_vbo_draw_prims(struct gl_context *ctx,
 			 GLuint max_index,
 			 struct gl_transform_feedback_object *tfb_vertcount)
 {
+   // printf("DEBUG: _tnl_vbo_draw_prims at ./src/mesa/tnl/t_draw.c\n");  // WKIM_DEBUG_LINE
    const struct gl_client_array **arrays = ctx->Array._DrawArrays;
 
    if (!index_bounds_valid)
@@ -436,6 +469,7 @@ void _tnl_draw_prims( struct gl_context *ctx,
 		      GLuint min_index,
 		      GLuint max_index)
 {
+   // printf("DEBUG: _tnl_draw_prims at ./src/mesa/tnl/t_draw.c\n");  // WKIM_DEBUG_LINE
    TNLcontext *tnl = TNL_CONTEXT(ctx);
    const GLuint TEST_SPLIT = 0;
    const GLint max = TEST_SPLIT ? 8 : tnl->vb.Size - MAX_CLIPPED_VERTICES;
